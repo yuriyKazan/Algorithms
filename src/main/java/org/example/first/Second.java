@@ -14,7 +14,7 @@ public class Second {
 
     public static void main(String[] args){
 
-        //X*Y=10^n*ac+10^n/2*((a+b)(c+d)−ac−bd)+bd
+        // formula X*Y=10^n*ac+10^n/2*((a+b)(c+d)−ac−bd)+bd
 
         String x = "1685287499328328297814655639278583667919355849391453456921116729";
         String y = "7114192848577754587969744626558571536728983167954552999895348492";
@@ -28,8 +28,14 @@ public class Second {
     }
 
     private static BigInteger multiplyKaratsuba(String x, String y) {
+
+        if (x.length() == 1 && y.length() == 1) {
+            return new BigInteger(x).multiply(new BigInteger(y));
+        }
+
         int numbersSize;
         System.out.println("---");
+        //alignment of numbers by the number of digits to a multiple of 2
         if (x.length() != y.length()) {
             System.out.println("x!=y " + x + " " + y);
             if (x.length() > y.length()) {
@@ -53,6 +59,7 @@ public class Second {
         }
         numbersSize = x.length();
 
+        //dividing the input numbers into two equal parts
         System.out.println("numbersSize:" + numbersSize);
         System.out.println("x:" + x);
         System.out.println("y:" + y);
@@ -65,42 +72,23 @@ public class Second {
         System.out.println("d:" + y.substring(numbersSize/2));
         BigInteger d = new BigInteger(y.substring(numbersSize/2));
 
-        BigInteger aAndC;
-        if (a.toString().length() > 1 | c.toString().length() > 1) {
-            aAndC = multiplyKaratsuba(a.toString(), c.toString());
-        } else {
-            aAndC = a.multiply(c);
-        }
-
-        BigInteger bAndD;
-        if (b.toString().length() > 1 | d.toString().length() > 1) {
-            bAndD = multiplyKaratsuba(b.toString(), d.toString());
-        } else {
-            bAndD = b.multiply(d);
-        }
-
-        BigInteger aBAndCD;
-        if (a.add(b).toString().length() > 1 | c.add(d).toString().length() > 1) {
-            aBAndCD = multiplyKaratsuba(a.add(b).toString(), c.add(d).toString());
-        } else {
-            aBAndCD = (a.add(b)).multiply(c.add(d));
-        }
-
+        //calculation
+        BigInteger aAndC = multiplyKaratsuba(a.toString(), c.toString());
+        BigInteger bAndD = multiplyKaratsuba(b.toString(), d.toString());
+        BigInteger aBAndCD = multiplyKaratsuba(a.add(b).toString(), c.add(d).toString());
         BigInteger aAndDPlusBAndC = aBAndCD.subtract(aAndC).subtract(bAndD);
         System.out.println("aAndDPlusBAndC:" + aAndDPlusBAndC);
 
+        //finding the number of occurrences specific numbers
         if (aAndDPlusBAndC.intValue() == firstValue){
             firstCounter++;
         }
-
         if (aAndDPlusBAndC.intValue() == secondValue){
             secondCounter++;
         }
-
         if (aAndDPlusBAndC.intValue() == thirdValue){
             thirdCounter++;
         }
-
         BigInteger firstPart = (BigDecimal.valueOf(Math.pow(10, numbersSize)).toBigInteger()).multiply(aAndC);
         BigInteger secondPart = (BigDecimal.valueOf(Math.pow(10, (double)numbersSize /2)).toBigInteger()).multiply(
                 aAndDPlusBAndC
